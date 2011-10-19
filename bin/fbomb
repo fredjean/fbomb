@@ -86,29 +86,35 @@ Main {
 
       url = URI.parse("http://#{ @token }:x@streaming.campfirenow.com//room/#{ @room.id }/live.json")
 
-      trap('INT'){ exit }
+      trap('INT'){ @room.leave; exit }
 
       loop do
         logging_errors do
-          Yajl::HttpStream.get(url) do |message|
-            case message['type'].to_s
-              when 'TextMessage'
-                body = message['body'].to_s
-                tokens = body.scan(%r/[^\s]+/)
-                arg, *args = tokens
+          begin
+            Yajl::HttpStream.get(url) do |message|
+              case message['type'].to_s
+                when 'TextMessage'
+                  body = message['body'].to_s
+                  tokens = body.scan(%r/[^\s]+/)
+                  arg, *args = tokens
 
-                if arg =~ %r|^\s*/|
-                  path = arg.strip
-                  command = FBomb::Command.table[path]
-                  if command
-                    logging_errors do
-                      logger.info("#{ path } #{ args.join(' ') }")
-                      command.call(*args)
+                  if arg =~ %r|^\s*/|
+                    path = arg.strip
+                    command = FBomb::Command.table[path]
+                    if command
+                      logging_errors do
+                        logger.info("#{ path } #{ args.join(' ') }")
+                        command.call(*args)
+                      end
                     end
                   end
-                end
+              end
             end
-         end
+          rescue Yajl::HttpStream::HttpError
+            m, c, b = e.message, e.class, Array(e.backtrace).join("\n")
+            logger.error("#{ m }(#{ c })\n#{ b }")
+            sleep(rand(42))
+          end  
 
           sleep(rand(42))
         end
