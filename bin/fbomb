@@ -110,7 +110,7 @@ Main {
                   end
               end
             end
-          rescue Yajl::HttpStream::HttpError
+          rescue Yajl::HttpStream::HttpError => e
             m, c, b = e.message, e.class, Array(e.backtrace).join("\n")
             logger.error("#{ m }(#{ c })\n#{ b }")
             sleep(rand(42))
