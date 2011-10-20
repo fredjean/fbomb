@@ -90,32 +90,26 @@ Main {
 
       loop do
         logging_errors do
-          begin
-            Yajl::HttpStream.get(url) do |message|
-              case message['type'].to_s
-                when 'TextMessage'
-                  body = message['body'].to_s
-                  tokens = body.scan(%r/[^\s]+/)
-                  arg, *args = tokens
+          
+          Yajl::HttpStream.get(url) do |message|
+            case message['type'].to_s
+              when 'TextMessage'
+                body = message['body'].to_s
+                tokens = body.scan(%r/[^\s]+/)
+                arg, *args = tokens
 
-                  if arg =~ %r|^\s*/|
-                    path = arg.strip
-                    command = FBomb::Command.table[path]
-                    if command
-                      logging_errors do
-                        logger.info("#{ path } #{ args.join(' ') }")
-                        command.call(*args)
-                      end
+                if arg =~ %r|^\s*/|
+                  path = arg.strip
+                  command = FBomb::Command.table[path]
+                  if command
+                    logging_errors do
+                      logger.info("#{ path } #{ args.join(' ') }")
+                      command.call(*args)
                     end
                   end
+                end
               end
-            end
-          rescue Yajl::HttpStream::HttpError => e
-            m, c, b = e.message, e.class, Array(e.backtrace).join("\n")
-            logger.error("#{ m }(#{ c })\n#{ b }")
-            sleep(rand(42))
-          end  
-
+           end
           sleep(rand(42))
         end
       end
@@ -135,6 +129,12 @@ Main {
   def logging_errors(&block)
     begin
       block.call()
+    rescue Yajl::HttpStream::HttpError => e
+      m, c, b = e.message, e.class, Array(e.backtrace).join("\n")
+      rand_sleep = rand(42)
+      logger.error("#{ m }(#{ c })\n#{ b }")
+      logger.error("trying again in #{rand_sleep} seconds...")
+      sleep(rand_sleep)
     rescue Object => e
       raise if e.is_a?(SystemExit)
       m, c, b = e.message, e.class, Array(e.backtrace).join("\n")
