@@ -86,10 +86,11 @@ Main {
 
       url = URI.parse("http://#{ @token }:x@streaming.campfirenow.com//room/#{ @room.id }/live.json")
 
-      trap('INT'){ exit }
+      trap('INT'){ @room.leave; exit }
 
       loop do
         logging_errors do
+          
           Yajl::HttpStream.get(url) do |message|
             case message['type'].to_s
               when 'TextMessage'
@@ -107,9 +108,8 @@ Main {
                     end
                   end
                 end
-            end
-         end
-
+              end
+           end
           sleep(rand(42))
         end
       end
@@ -129,6 +129,12 @@ Main {
   def logging_errors(&block)
     begin
       block.call()
+    rescue Yajl::HttpStream::HttpError => e
+      m, c, b = e.message, e.class, Array(e.backtrace).join("\n")
+      rand_sleep = rand(42)
+      logger.error("#{ m }(#{ c })\n#{ b }")
+      logger.error("trying again in #{rand_sleep} seconds...")
+      sleep(rand_sleep)
     rescue Object => e
       raise if e.is_a?(SystemExit)
       m, c, b = e.message, e.class, Array(e.backtrace).join("\n")

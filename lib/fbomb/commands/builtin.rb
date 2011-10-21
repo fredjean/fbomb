@@ -71,8 +71,21 @@ FBomb {
         when /image|img|i/i
           args.shift
           query = args.join(' ')
+          sizes = [:i, :s, :m, :l, :xl]
+          size_regex =  /(:i|:s|:m|:l|:xl)/
+          if size = query.match(size_regex)
+            size = size[1]
+            query.gsub!(size,'').strip!
+            size = case size
+              when ":i" then :icon
+              when ":s" then :small
+              when ":m" then :medium
+              when ":l" then :large
+              when ":xl" then :xlarge
+            end
+          end
           @cache ||= []
-          images = Google::Search::Image.new(:query => query, :image_size => :small)
+          images = Google::Search::Image.new(:query => query, :image_size => size || :medium)
           if images.any?
             images.each do |result|
               next if @cache.include? result.id
