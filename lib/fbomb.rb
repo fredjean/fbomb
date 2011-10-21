@@ -17,22 +17,6 @@
       FBomb::Version
     end
 
-    def dependencies
-      {
-        'tinder'              =>  [ 'tinder'         , '>= 1.7.0'   ]  ,
-        'yajl'                =>  [ 'yajl-ruby'      , '~> 1.0.0'   ]  ,
-        'fukung'              =>  [ 'fukung'         , '>= 1.1.0'   ]  ,
-        'main'                =>  [ 'main'           , '>= 4.7.6'   ]  ,
-        'nokogiri'            =>  [ 'nokogiri'       , '>= 1.5.0'   ]  ,
-        'google-search'       =>  [ 'google-search'  , '>= 1.0.2'   ]  ,
-        'unidecode'           =>  [ 'unidecode'      , '>= 1.0.0'   ]  ,
-        'systemu'             =>  [ 'systemu'        , '>= 2.3.0'   ]  ,
-        'pry'                 =>  [ 'pry'            , '>= 0.9.6.2' ]  ,
-        'mechanize'           =>  [ 'mechanize'      , '>= 2.0.1'   ]  ,
-        'mime/types'          =>  [ 'mime-types'     , '>= 1.16'    ]
-      }
-    end
-
     def libdir(*args, &block)
       @libdir ||= File.expand_path(__FILE__).sub(/\.rb$/,'')
       args.empty? ? @libdir : File.join(@libdir, *args)
@@ -55,32 +39,22 @@
     extend(FBomb)
   end
 
-## isolate gems
+## require gems
 #
   require 'rubygems'
-  # require 'isolate'
-
-  libdir = File.expand_path(File.join('~', '.fbomb', 'isolate'))
-  options = {:file => false, :path => libdir}
-
-  # Isolate::Sandbox.new(options) do
-    ::FBomb.dependencies.each do |lib, dependency|
-      #puts "="*45
-      #puts lib
-      #puts dependency
-      #puts "="*45
-      gem(*dependency)
-    end
-  # end.activate
-  # Isolate.refresh
-
-## load gems
-#
-  ::FBomb.dependencies.each do |lib, dependency|
-    require(lib)
-  end
+  require 'tinder'
+  require 'yajl'
   require "yajl/json_gem"     ### this *replaces* any other JSON.parse !
   require "yajl/http_stream"  ### we really do need this
+  require 'fukung'
+  require 'main'
+  require 'nokogiri'
+  require 'google-search'
+  require 'unidecode'
+  require 'systemu'
+  require 'pry'
+  require 'mechanize'
+  require 'mime/types'
 
 ## load fbomb
 #
