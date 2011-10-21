@@ -1,5 +1,8 @@
 #! /usr/bin/env ruby
 
+require 'rubygems'
+require 'bundler/setup'
+
 Main {
 ##
 #
@@ -55,7 +58,7 @@ Main {
       require 'pry'
       Pry.hooks[:before_session] = proc{}
       prompt = "#{ config.campfire.domain }[#{ config.campfire.room }] >> "
-      Pry.config.prompt = proc{|*a| prompt } 
+      Pry.config.prompt = proc{|*a| prompt }
       binding.pry
     end
 
