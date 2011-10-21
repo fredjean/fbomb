@@ -17,7 +17,7 @@ FBomb {
 
   command(:reload){
     help 'reload fbomb commands'
-    
+
     call do |*args|
       #Thread.critical = true
       table = FBomb::Command.table
@@ -27,6 +27,7 @@ FBomb {
         FBomb::Command.load(Command.command_paths)
 
         messages = [
+          "hello hommies.",
           "locked and loaded.",
           "locked, cocked, and ready to rock.",
           "let's roll.",
