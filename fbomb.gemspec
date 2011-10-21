@@ -25,12 +25,12 @@ Gem::Specification::new do |spec|
  "lib/fbomb/util.rb"]
 
   spec.executables = ["fbomb"]
-  
+
   spec.require_path = "lib"
 
   spec.test_files = nil
 
-  
+
     spec.add_dependency(*["tinder"        , "~> 1.7.0"])
     spec.add_dependency(*["main"          , "~> 4.7.6"])
     spec.add_dependency(*["fukung"        , "~> 1.1.0"])
@@ -39,7 +39,9 @@ Gem::Specification::new do |spec|
     spec.add_dependency(*['google-search' , '~> 1.0.2'])
     spec.add_dependency(*['unidecode'     , '~> 1.0.0'])
     spec.add_dependency(*['systemu'       , '~> 2.3.0'])
-    
+    spec.add_dependency(*['mechanize'     , '~> 2.0.1'])
+    spec.add_dependency(*['pry'           , '~> 0.9.6'])
+
 
   spec.extensions.push(*[])
 
