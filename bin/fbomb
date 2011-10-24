@@ -4,8 +4,8 @@ require 'rubygems'
 require 'bundler/setup'
 
 Main {
-##
-#
+  ##
+  #
   edit_config_file! <<-__
     campfire:
       domain: YOUR_CAMPFIRE_DOMAIN
@@ -20,8 +20,8 @@ Main {
 
   option('--force', '-f')
 
-##
-#
+  ##
+  #
   def run
     load_commands!
     load_room!
@@ -49,8 +49,8 @@ Main {
     exit
   end
 
-##
-#
+  ##
+  #
   mode(:shell) do
     def run
       load_commands!
@@ -69,8 +69,8 @@ Main {
     end
   end
 
-##
-#
+  ##
+  #
   mode(:run) do
     def run
       load_commands!
@@ -90,30 +90,24 @@ Main {
 
       loop do
         logging_errors do
-          begin
-            Yajl::HttpStream.get(url) do |message|
-              case message['type'].to_s
-              when 'TextMessage'
-                body = message['body'].to_s
-                tokens = body.scan(%r/[^\s]+/)
-                arg, *args = tokens
+          Yajl::HttpStream.get(url) do |message|
+            case message['type'].to_s
+            when 'TextMessage'
+              body = message['body'].to_s
+              tokens = body.scan(%r/[^\s]+/)
+              arg, *args = tokens
 
-                if arg =~ %r|^\s*/|
-                  path = arg.strip
-                  command = FBomb::Command.table[path]
-                  if command
-                    logging_errors do
-                    logger.info("#{ path } #{ args.join(' ') }")
-                    command.call(*args)
-                    end
+              if arg =~ %r|^\s*/|
+                path = arg.strip
+                command = FBomb::Command.table[path]
+                if command
+                  logging_errors do
+                  logger.info("#{ path } #{ args.join(' ') }")
+                  command.call(*args)
                   end
                 end
               end
             end
-          rescue Yajl::HttpStream::HttpError
-            m, c, b = e.message, e.class, Array(e.backtrace).join("\n")
-            logger.error("#{ m }(#{ c })\n#{b}")
-            sleep(rand(42))
           end
           sleep(rand(42))
         end
@@ -121,16 +115,16 @@ Main {
     end
   end
 
-##
-#
+  ##
+  #
   mode(:setup) do
     def run
       puts self.class.config_path
     end
   end
 
-##
-#
+  ##
+  #
   def logging_errors(&block)
     begin
       block.call()
