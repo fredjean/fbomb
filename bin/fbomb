@@ -134,6 +134,7 @@ Main {
       logger.error("#{ m }(#{ c })\n#{ b }")
       logger.error("trying again in #{rand_sleep} seconds...")
       sleep(rand_sleep)
+      load_room!
     rescue Object => e
       raise if e.is_a?(SystemExit)
       m, c, b = e.message, e.class, Array(e.backtrace).join("\n")
