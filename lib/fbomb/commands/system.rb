@@ -14,6 +14,14 @@ FBomb {
       paste(msg) unless msg.strip.empty?
     end
   }
+  
+  command(:in_da_house){
+    call do
+      usernames = room.users.map{|u| u['name']}
+      usernames.delete('dickburt') #todo figure out the bot's username.
+      speak("howdy folks.")
+    end
+  }
 
   command(:reload){
     help 'reload fbomb commands'

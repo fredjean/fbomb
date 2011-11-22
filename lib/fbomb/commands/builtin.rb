@@ -340,5 +340,79 @@ FBomb {
       speak('http://ficdn.fashionindie.com/wp-content/uploads/2010/04/exterface_unicorn_03.jpg')
     end
   }
+##
+#
+  command(:youtube){
+    setup{ require "google-search" }
+
+    call do |*args|
+      msg = ""
+      query = CGI.escape(args.join(' ').strip)
+      videos = Google::Search::Video.new(:query => query)
+      puts "="*45
+      puts videos.inspect
+      puts "="*45
+      @cache ||= []
+      if videos.any?
+        videos.each do |result|
+          uri = CGI.unescape(result.uri)
+          match = uri.match(/(http:\/\/www.youtube.com\/watch\?)(.+)/)
+          video_id = match[2].split('&').first
+          uri = match[1] + video_id
+          next if @cache.include? video_id
+          @cache << video_id
+          msg = "#{ uri }\n"
+          break
+        end
+      else
+        msg = "No results for: #{query}"
+      end
+      speak(msg) unless msg.empty?
+    end
+  }
+##
+#
+    command(:imgur){
+
+    call do |*args|
+      @cache ||= []
+      msg = ""
+      url = "http://imgur.com/gallery.json"
+      if @hot_photos.nil? || (Time.now.to_i - @hot_photos[:fetched_at] > 10800 if @hot_photos) # get new photos every 3 hours
+        puts "getting hot photos"
+        hot_photos_url = "http://imgur.com/gallery/hot.json"
+        json = `curl --location --silent #{ url.inspect }`
+        @hot_photos = {:photos => JSON.parse(json)["gallery"].collect{|p| Map.new(p)}, :fetched_at => Time.now.to_i}
+      end
+      # Try to search, 
+      if args.any?
+        url << "?q=#{CGI.escape(args.join(' ').strip)}" 
+        json = `curl --location --silent #{ url.inspect }`
+        photos = JSON.parse(json)["gallery"].collect{|p| Map.new(p)}
+        photos.each do |photo|
+          next if @cache.include? photo['hash']
+          @cache << photo['hash']
+          msg = "http://i.imgur.com/#{photo["hash"]}#{photo.ext}\n"
+          @title = photo.title
+          break
+        end
+        search_failed = true if msg.empty?
+      end
+      # If there weren't args or the search failed grab a photo from hot photos
+      if args.empty? || !!search_failed
+        @hot_photos[:photos].each do |photo|
+          next if @cache.include? photo['hash']
+          @cache << photo['hash']
+          msg = "http://i.imgur.com/#{photo["hash"]}#{photo.ext}\n"
+          @title = photo.title
+          break
+        end
+        speak("Sorry, couldn't find any more photos for \"#{args.join("+")}\" so here's something else") if search_failed
+      end
+      speak(msg) unless msg.empty?
+      speak(@title) if @title
+    end
+  }
+
 }
 
