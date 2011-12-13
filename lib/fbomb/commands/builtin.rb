@@ -4,7 +4,7 @@ FBomb {
 #
   command(:reload){
     help 'reload fbomb commands'
-    
+
     call do |*args|
       FBomb::Command.table = FBomb::Command::Table.new
       FBomb::Command.load(Command.command_paths)
@@ -13,7 +13,7 @@ FBomb {
   }
 
 ##
-#  
+#
   command(:rhymeswith) {
     help 'show ryhming words'
 
@@ -105,7 +105,7 @@ FBomb {
       speak(msg) unless msg.empty?
     end
   }
-  
+
 ##
 #
   command(:fail){
@@ -132,7 +132,7 @@ FBomb {
       speak(msg) unless msg.empty?
     end
   }
-  
+
 ##
 #
   command(:gist) {
@@ -337,11 +337,11 @@ FBomb {
 #
   command(:unicorn){
     urls = [
-      'http://ficdn.fashionindie.com/wp-content/uploads/2010/04/exterface_unicorn_03.jpg', 
+      'http://ficdn.fashionindie.com/wp-content/uploads/2010/04/exterface_unicorn_03.jpg',
       'http://fc04.deviantart.net/fs51/f/2009/281/a/7/White_Unicorn_My_Little_Pony_by_Barkingmadd.jpg'
     ]
     call do |*args|
-      speak(urls.sample)
+      speak(urls[rand urls.size])
     end
   }
 ##
@@ -388,9 +388,9 @@ FBomb {
         json = `curl --location --silent #{ url.inspect }`
         @hot_photos = {:photos => JSON.parse(json)["gallery"].collect{|p| Map.new(p)}, :fetched_at => Time.now.to_i}
       end
-      # Try to search, 
+      # Try to search,
       if args.any?
-        url << "?q=#{CGI.escape(args.join(' ').strip)}" 
+        url << "?q=#{CGI.escape(args.join(' ').strip)}"
         json = `curl --location --silent #{ url.inspect }`
         photos = JSON.parse(json)["gallery"].collect{|p| Map.new(p)}
         photos.each do |photo|
